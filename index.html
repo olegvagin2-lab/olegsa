@@ -39,6 +39,24 @@
         filter: blur(30px);
         opacity: 0.4;
     }
+        /* Анимация плавного парения */
+@keyframes float {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.floating-icon {
+    position: absolute;
+    z-index: 0; /* Чтобы иконки были за текстом или под фото */
+    animation: float 6s ease-in-out infinite;
+    opacity: 0.6; /* Делаем их чуть прозрачными, чтобы не отвлекали */
+    pointer-events: none; /* Чтобы они не мешали нажимать на кнопки */
+}
+
+/* Разная задержка анимации, чтобы они двигались не синхронно */
+.delay-1 { animation-delay: 1s; }
+.delay-2 { animation-delay: 2s; }
 </style>
 </head>
 <body class="text-gray-800">
@@ -60,7 +78,11 @@
     </div>
 </nav>
 
-    <section class="pt-32 pb-20 px-6 overflow-hidden">
+   <section class="relative pt-32 pb-20 px-6 overflow-hidden">
+    <div class="floating-icon delay-1 text-6xl top-20 left-10 text-orange-200 hidden lg:block">x{+y}></div>
+    <div class="floating-icon delay-2 text-5xl bottom-10 left-1/4 text-purple-200 hidden lg:block">{}</div>
+    <div class="floating-icon text-6xl top-40 right-20 text-red-200 hidden lg:block">⚛️</div>
+    <div class="floating-icon delay-1 text-4xl top-1/2 right-1/3 text-blue-200 hidden lg:block">∑</div>
     <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-8">
         <div class="md:w-1/2 space-y-8 z-10">
             <span class="inline-block bg-orange-100 text-orange-600 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider">Официальный центр в Перми</span>
@@ -136,6 +158,7 @@
                     </div>
                 </div>
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-sm pinterest-card border border-blue-50">
+                    <div class="absolute -top-6 -right-6 text-4xl">🦖</div>
                     <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl mb-6">💻</div>
                     <h3 class="text-2xl font-bold mb-3">Программирование</h3>
                     <p class="text-gray-600 text-sm mb-6">Создаем свои игры и мультфильмы на Scratch и Python. От блоков к чистому коду.</p>
