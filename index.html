@@ -7,6 +7,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Контейнер галереи */
+        .modal-gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+            opacity: 0; /* Скрыто изначально */
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+            /* Когда добавлен класс show — галерея плавно проявляется */
+            .modal-gallery.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .modal-gallery img {
+                width: 100%;
+                height: 180px;
+                object-fit: cover;
+                border-radius: 18px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            }
         .modal-gallery {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -108,17 +132,17 @@
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); /* Мягкая тень */
                 overflow: hidden !important;
             }
-        /* --- МОДАЛЬНОЕ ОКНО БЕЗ СКРОЛЛА --- */
-        #course-modal .modal-animate {
-            max-height: 95vh; /* Ограничение по высоте экрана */
-            overflow-y: hidden; /* Убираем скролл внутри белого блока */
-            display: flex;
-            flex-direction: column;
-            background: rgba(255, 255, 255, 0.85); /* Эффект стекла */
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            position: relative;
-        }
+            /* --- МОДАЛЬНОЕ ОКНО БЕЗ СКРОЛЛА --- */
+            #course-modal .modal-animate {
+                max-height: 95vh; /* Ограничение по высоте экрана */
+                overflow-y: hidden; /* Убираем скролл внутри белого блока */
+                display: flex;
+                flex-direction: column;
+                background: rgba(255, 255, 255, 0.85); /* Эффект стекла */
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                position: relative;
+            }
 
         /* Навыки в виде плитки (красивые кнопки) */
         #modal-list {
@@ -797,31 +821,31 @@
             if (!grid || !checkboxes) return;
 
             grid.innerHTML = courses.map(c => `
-                            <div class="card-hover ${c.theme}" onclick="showCourseDetails(${c.id})">
-                                <div class="card-header">
-                                    <span class="age-badge">${c.age}</span>
-                                    <div class="icon-box"><i class="fas ${c.icon}"></i></div>
+                                <div class="card-hover ${c.theme}" onclick="showCourseDetails(${c.id})">
+                                    <div class="card-header">
+                                        <span class="age-badge">${c.age}</span>
+                                        <div class="icon-box"><i class="fas ${c.icon}"></i></div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h3 class="card-title text-xl font-bold mb-2">${c.title}</h3>
+                                        <p class="card-description text-sm text-gray-600">${c.desc}</p>
+                                    </div>
+                                    <div class="card-footer mt-4 text-indigo-600 font-bold text-sm">Подробнее →</div>
                                 </div>
-                                <div class="card-body">
-                                    <h3 class="card-title text-xl font-bold mb-2">${c.title}</h3>
-                                    <p class="card-description text-sm text-gray-600">${c.desc}</p>
-                                </div>
-                                <div class="card-footer mt-4 text-indigo-600 font-bold text-sm">Подробнее →</div>
-                            </div>
-                        `).join('');
+                            `).join('');
 
             checkboxes.innerHTML = courses.map(c => `
-                            <label class="group relative flex items-center gap-3 p-4 bg-slate-50 rounded-2xl cursor-pointer border-2 border-transparent has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 transition-all">
-                                <input type="checkbox" name="course" value="${c.title}" class="course-input hidden" onchange="handleCourseLimit()">
-                                <div class="w-5 h-5 rounded border-2 border-slate-200 group-has-[:checked]:bg-indigo-500 group-has-[:checked]:border-indigo-500 flex items-center justify-center transition-all">
-                                    <i class="fas fa-check text-white text-[10px]"></i>
-                                </div>
-                                <div class="flex flex-col">
-                                    <span class="text-sm font-bold text-slate-700">${c.title}</span>
-                                    <span class="text-[10px] text-slate-400">${c.age}</span>
-                                </div>
-                            </label>
-                        `).join('');
+                                <label class="group relative flex items-center gap-3 p-4 bg-slate-50 rounded-2xl cursor-pointer border-2 border-transparent has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 transition-all">
+                                    <input type="checkbox" name="course" value="${c.title}" class="course-input hidden" onchange="handleCourseLimit()">
+                                    <div class="w-5 h-5 rounded border-2 border-slate-200 group-has-[:checked]:bg-indigo-500 group-has-[:checked]:border-indigo-500 flex items-center justify-center transition-all">
+                                        <i class="fas fa-check text-white text-[10px]"></i>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-bold text-slate-700">${c.title}</span>
+                                        <span class="text-[10px] text-slate-400">${c.age}</span>
+                                    </div>
+                                </label>
+                            `).join('');
         }
 
         function handleCourseLimit() {
@@ -970,7 +994,7 @@ ${selected.map(c => `• ${c}`).join('\n')}`;
 👶 *Ребенок:* ${child} (${dob})
 🏫 *Школа:* ${school}
 📚 *Курсы:* ${selected.join(', ') || 'Не выбраны'}
-            `;
+                `;
 
                 try {
                     const response = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
@@ -1042,7 +1066,7 @@ ${selected.map(c => `• ${c}`).join('\n')}`;
 🏫 <b>Школа/Класс:</b> ${fd.get('school_info') || '—'}
 
 📚 <b>КУРСЫ:</b> ${coursesText}
-                `;
+                    `;
 
             // 3. Отправка через API Telegram
             try {
@@ -1143,19 +1167,19 @@ ${selected.map(c => `• ${c}`).join('\n')}`;
             if (!grid) return;
 
             grid.innerHTML = mentors.map(m => `
-                <div class="bg-white p-6 rounded-[2rem] flex items-center gap-4 shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                    <div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 flex items-center justify-center font-black ${m.color}">
-                        ${m.photo
+                    <div class="bg-white p-6 rounded-[2rem] flex items-center gap-4 shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                        <div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 flex items-center justify-center font-black ${m.color}">
+                            ${m.photo
                     ? `<img src="${m.photo}" alt="${m.name}" class="w-full h-full object-cover" onerror="this.style.display='none'">`
                     : m.initials
                 }
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-lg">${m.name}</h4>
+                            <p class="text-xs text-indigo-500 uppercase font-bold tracking-wider">${m.role}</p>
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="font-bold text-slate-900 text-lg">${m.name}</h4>
-                        <p class="text-xs text-indigo-500 uppercase font-bold tracking-wider">${m.role}</p>
-                    </div>
-                </div>
-            `).join(''); course - modal
+                `).join(''); course - modal
         }
 
         // 3. Запуск (добавьте вызов функции в конец скрипта)
@@ -1192,8 +1216,8 @@ ${selected.map(c => `• ${c}`).join('\n')}`;
             document.getElementById('modal-title').innerText = c.title;
             document.getElementById('modal-desc').innerText = c.details || c.desc;
             document.getElementById('modal-list').innerHTML = c.skills.map(s => `
-        <li><i class="fas fa-check-circle" style="color: ${currentColor}"></i><span>${s}</span></li>
-    `).join('');
+            <li><i class="fas fa-check-circle" style="color: ${currentColor}"></i><span>${s}</span></li>
+        `).join('');
 
             const modal = document.getElementById('course-modal');
 
@@ -1221,18 +1245,18 @@ ${selected.map(c => `• ${c}`).join('\n')}`;
 
         const list = document.getElementById('modal-list');
         list.innerHTML = c.skills.map(s => `
-    <li><i class="fas fa-check-circle" style="color: ${currentColor}"></i><span>${s}</span></li>
+        <li><i class="fas fa-check-circle" style="color: ${currentColor}"></i><span>${s}</span></li>
 `).join('');
 
         // ДОБАВЛЯЕМ ФОТО ТОЛЬКО ДЛЯ ЭЛЕКТРОНИКИ
         if (id === 'electronics') {
             const galleryHTML = `
-        <div class="modal-gallery">
-            <img src="./sGfqzEKx4yGS7p6jY59fRfbucvmIOBbJ89vNpl7Jdgw7Vrv9k0E-VbKDwIMzfrvd-xdG2vpyMMEcK5w2tUpSSSTk.jpg
+            <div class="modal-gallery">
+                <img src="./sGfqzEKx4yGS7p6jY59fRfbucvmIOBbJ89vNpl7Jdgw7Vrv9k0E-VbKDwIMzfrvd-xdG2vpyMMEcK5w2tUpSSSTk.jpg
 ">
-            <img src="./70JbJPrgntxe3d9YFZ3JruBHFRoiU3F18indUA8u58rYKxCzPNyCY9vBo_HpQflRR3wtbUqrD9PR5Hwg-YkE8MoV.jpg">
-        </div>
-    `;
+                <img src="./70JbJPrgntxe3d9YFZ3JruBHFRoiU3F18indUA8u58rYKxCzPNyCY9vBo_HpQflRR3wtbUqrD9PR5Hwg-YkE8MoV.jpg">
+            </div>
+        `;
             list.insertAdjacentHTML('afterend', galleryHTML);
         }
 
@@ -1248,23 +1272,23 @@ ${selected.map(c => `• ${c}`).join('\n')}`;
             }, 400);
         }
         // 1. Обработка клика по фону (Overlay)
-document.getElementById('course-modal').addEventListener('click', function (e) {
-    // Если кликнули именно по фону (this), а не по белому окну внутри
-    if (e.target === this) {
-        closeCourseModal(); 
-    }
-});
+        document.getElementById('course-modal').addEventListener('click', function (e) {
+            // Если кликнули именно по фону (this), а не по белому окну внутри
+            if (e.target === this) {
+                closeCourseModal();
+            }
+        });
 
-// 2. Обработка клавиши Escape
-document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-        const modal = document.getElementById('course-modal');
-        // Закрываем, только если модалка сейчас открыта (не скрыта)
-        if (!modal.classList.contains('hidden')) {
-            closeCourseModal();
-        }
-    }
-});
+        // 2. Обработка клавиши Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('course-modal');
+                // Закрываем, только если модалка сейчас открыта (не скрыта)
+                if (!modal.classList.contains('hidden')) {
+                    closeCourseModal();
+                }
+            }
+        });
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
