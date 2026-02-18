@@ -7,6 +7,68 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Правое окно для фото */
+        .extra-photo-right {
+            position: fixed;
+            top: 50%;
+            /* Рассчитываем положение справа от центра */
+            right: calc(50% - 500px);
+            width: 240px;
+            height: 320px;
+            z-index: 1001;
+            pointer-events: none;
+            opacity: 0;
+            /* Наклон вправо и уменьшение для анимации */
+            transform: translateY(-50%) scale(0.8) rotate(10deg);
+            transition: opacity 0.3s ease-in-out, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            .extra-photo-right.show {
+                opacity: 1;
+                transform: translateY(-50%) scale(1) rotate(3deg);
+            }
+
+        /* Скрываем оба фото на маленьких экранах */
+        @media (max-width: 1100px) {
+            .extra-photo-window, .extra-photo-right {
+                display: none;
+            }
+        }
+        /* Отдельное окно для фото слева */
+        .extra-photo-window {
+            position: fixed; /* Фиксируем относительно экрана */
+            top: 50%;
+            /* Рассчитываем положение: центр экрана минус половина ширины основного окна и зазор */
+            left: calc(50% - 500px);
+            width: 240px;
+            height: 320px;
+            z-index: 1001; /* Выше чем фон модалки */
+            opacity: 0;
+            transform: translateY(-50%) translateX(50px) rotate(-5deg);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+            .extra-photo-window.show {
+                opacity: 1;
+                transform: translateY(-50%) translateX(0) rotate(-3deg);
+            }
+
+            .extra-photo-window img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 24px;
+                box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+                border: 2px solid rgba(255, 255, 255, 0.1);
+            }
+
+        /* Скрываем на мобильных и маленьких мониторах */
+        @media (max-width: 1100px) {
+            .extra-photo-window {
+                display: none;
+            }
+        }
         /* Базовый стиль для картинки-подложки */
         .side-photo-left {
             position: absolute;
@@ -1260,124 +1322,86 @@ ${selected.map(c => `• ${c}`).join('\n')}`;
             }
         });
         function showCourseDetails(id) {
-            // Внутри функции showCourseDetails(id)
-            if (id === 8) {
-                // Находим основное белое окно модалки
-                const modalContent = document.querySelector('.modal-animate');
-
-                // Создаем элемент изображения
-                const leftImg = document.createElement('img');
-                leftImg.src = './sGfqzEKx4yGS7p6jY59fRfbucvmIOBbJ89vNpl7Jdgw7Vrv9k0E-VbKDwIMzfrvd-xdG2vpyMMEcK5w2tUpSSSTk.jpg';
-                leftImg.className = 'side-photo-left';
-                leftImg.id = 'dynamic-left-photo';
-
-                // Добавляем картинку внутрь контейнера (но за счет z-index она будет СЗАДИ)
-                modalContent.appendChild(leftImg);
-
-                // Запускаем анимацию с небольшой задержкой
-                setTimeout(() => {
-                    leftImg.classList.add('active');
-                }, 300);
-            }
             const c = courses.find(x => x.id === id);
             if (!c) return;
 
-            // 1. Заполняем стандартные поля (убедитесь, что ID в HTML совпадают!)
-            const titleElem = document.getElementById('modal-title');
-            const descElem = document.getElementById('modal-desc');
-            const listElem = document.getElementById('modal-list');
+            // Очистка всех старых фото перед открытием
+            document.querySelectorAll('.extra-photo-window, .extra-photo-right').forEach(el => el.remove());
 
-            if (titleElem) titleElem.innerText = c.title;
-            if (descElem) descElem.innerText = c.details || c.desc;
-            if (listElem) {
-                listElem.innerHTML = c.skills.map(s => `
-            <li class="flex items-center space-x-3">
-                <i class="fas fa-check-circle text-orange-500"></i>
-                <span>${s}</span>
-            </li>
-        `).join('');
-            }
+            // Заполнение текста модалки (стандартно)
+            document.getElementById('modal-title').innerText = c.title;
+            document.getElementById('modal-desc').innerText = c.details || c.desc;
 
-            // 2. УДАЛЯЕМ старые фото, если они остались от прошлого открытия
-            document.querySelectorAll('.side-photo').forEach(img => img.remove());
-
-            // 3. СПЕЦ-ЭФФЕКТ ДЛЯ "СВЕТЯЩЕГОСЯ ЧЕЛОВЕЧКА" (ID 8)
-            if (id === 8) {
-                const modalContent = document.querySelector('.modal-animate');
-
-                // Создаем левое фото
-                const imgL = document.createElement('img');
-                imgL.src = './sGfqzEKx4yGS7p6jY59fRfbucvmIOBbJ89vNpl7Jdgw7Vrv9k0E-VbKDwIMzfrvd-xdG2vpyMMEcK5w2tUpSSSTk.jpg';
-                imgL.className = 'side-photo left-pic';
-
-                // Создаем правое фото
-                const imgR = document.createElement('img');
-                imgR.src = './hQKxqIVkXib-_BDtDmRl_zLd6HJGOk1xvfMlKJotzEJHWpN17oK-YDNumlgYrpMRwrPV_fhPSYko8oxRwatSQ2S7.jpg';
-                imgR.className = 'side-photo right-pic';
-
-                modalContent.appendChild(imgL);
-                modalContent.appendChild(imgR);
-
-                // Плавное появление через задержку
-                setTimeout(() => {
-                    imgL.classList.add('show');
-                    imgR.classList.add('show');
-                }, 300);
-            }
-
-            // 4. Открываем модалку
+            // Открываем модалку
             const modal = document.getElementById('course-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            setTimeout(() => modal.classList.add('active'), 10);
+            requestAnimationFrame(() => modal.classList.add('active'));
+
+            // ДОБАВЛЯЕМ ФОТО ДЛЯ КУРСА ID 8
+            if (id === 8) {
+                // 1. Левое фото
+                const leftDiv = document.createElement('div');
+                leftDiv.className = 'extra-photo-window';
+                leftDiv.innerHTML = `<img src="./sGfqzEKx4yGS7p6jY59fRfbucvmIOBbJ89vNpl7Jdgw7Vrv9k0E-VbKDwIMzfrvd-xdG2vpyMMEcK5w2tUpSSSTk.jpg">`;
+                document.body.appendChild(leftDiv);
+
+                // 2. Правое фото (укажите путь к другому файлу, если нужно)
+                const rightDiv = document.createElement('div');
+                rightDiv.className = 'extra-photo-right';
+                rightDiv.innerHTML = `<img src="./sGfqzEKx4yGS7p6jY59fRfbucvmIOBbJ89vNpl7Jdgw7Vrv9k0E-VbKDwIMzfrvd-xdG2vpyMMEcK5w2tUpSSSTk.jpg">`;
+                document.body.appendChild(rightDiv);
+
+                // Включаем анимацию появления для обоих
+                requestAnimationFrame(() => {
+                    leftDiv.classList.add('show');
+                    rightDiv.classList.add('show');
+                });
+            }
         }
+        function removeSidePhotos() {
+            const photoWindow = document.getElementById('separate-photo-window');
+            if (photoWindow) {
+                photoWindow.classList.remove('show'); // Запускаем анимацию исчезновения
+                setTimeout(() => photoWindow.remove(), 400); // Удаляем из кода после анимации
+            }
+        }
+
+        // Обновленная функция закрытия
         function closeCourseModal() {
             const modal = document.getElementById('course-modal');
-            modal.classList.remove('active'); // Окно начинает уезжать вниз
+            const sidePhotos = document.querySelectorAll('.extra-photo-window, .extra-photo-right');
 
+            if (modal) modal.classList.remove('active');
+
+            // 1. Запускаем анимацию исчезновения (убираем классы)
+            if (modal) {
+                modal.classList.remove('active');
+            }
+
+            sidePhotos.forEach(photo => {
+                photo.classList.remove('show');
+            });
+
+            // 2. Ждем окончания анимации (300мс) перед полным скрытием
             setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                // Очищаем инлайновые стили, если они мешали
-                document.body.style.overflow = '';
-            }, 400);
+                if (modal && !modal.classList.contains('active')) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.body.style.overflow = '';
+
+                    // Полностью удаляем фото из DOM
+                    sidePhotos.forEach(photo => photo.remove());
+                }
+            }, 300);
         }
-        // 1. Обработка клика по фону (Overlay)
-        document.getElementById('course-modal').addEventListener('click', function (e) {
-            // Если кликнули именно по фону (this), а не по белому окну внутри
-            if (e.target === this) {
+
+        // Слушатель клика "за окно" (оверлей)
+        window.addEventListener('click', function (event) {
+            const modal = document.getElementById('course-modal');
+            if (event.target === modal) {
                 closeCourseModal();
             }
-        });
-
-        // 2. Обработка клавиши Escape
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                const modal = document.getElementById('course-modal');
-                // Закрываем, только если модалка сейчас открыта (не скрыта)
-                if (!modal.classList.contains('hidden')) {
-                    closeCourseModal();
-                }
-            }
-        });
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop,
-                        behavior: 'smooth'
-                    });
-                    const leftPhoto = document.getElementById('dynamic-left-photo');
-                    if (leftPhoto) {
-                        leftPhoto.classList.remove('active'); // Сначала плавно скрываем
-                        setTimeout(() => leftPhoto.remove(), 400); // Потом удаляем из кода
-                    }
-                }
-            });
         });
     </script>
     <div class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3">
