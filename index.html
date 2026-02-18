@@ -7,6 +7,51 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* ОБЩИЕ СТИЛИ (и для ПК, и для мобильных) */
+.extra-photo-right {
+    display: block !important;
+    position: fixed !important;
+    top: 50px; /* Отступ сверху */
+    right: 50px; /* Отступ справа */
+    width: 150px !important; /* На ПК сделаем чуть побольше */
+    height: 150px !important;
+    z-index: 2005 !important;
+    opacity: 0;
+    transform: scale(0.8) rotate(10deg);
+    transition: all 0.3s ease-in-out;
+}
+
+.extra-photo-right img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    
+    /* СТИЛЬ КАК У ЛЕВОЙ */
+    border: 6px solid white !important; /* Белая рамка */
+    border-radius: 20px !important;   /* Скругление */
+    box-shadow: 0 15px 45px rgba(0,0,0,0.4) !important; /* Тень */
+    
+    box-sizing: border-box !important;
+}
+
+/* Анимация появления */
+.extra-photo-right.show {
+    opacity: 1;
+    transform: scale(1) rotate(5deg);
+}
+
+/* КОРРЕКЦИЯ ДЛЯ МОБИЛЬНЫХ (чтобы на телефоне не была слишком большой) */
+@media (max-width: 768px) {
+    .extra-photo-right {
+        top: 20px !important;
+        right: 20px !important;
+        width: 90px !important;
+        height: 90px !important;
+    }
+    .extra-photo-right img {
+        border-width: 4px !important; /* На мобилке рамка чуть тоньше */
+    }
+}
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 
         body {
