@@ -7,6 +7,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        .modal-gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .modal-photo {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+            .modal-photo:hover {
+                transform: scale(1.03);
+            }
         /* Включаем плавность на уровне движка браузера */
         @media screen and (prefers-reduced-motion: no-preference) {
             html {
@@ -1196,6 +1216,24 @@ ${selected.map(c => `• ${c}`).join('\n')}`;
 
             const modalWindow = modal.querySelector('.modal-animate');
             modalWindow.style.background = `radial-gradient(circle at top right, ${currentColor}12, #ffffff)`;
+        }
+        // ... внутри функции showCourseDetails(id) ...
+
+        const list = document.getElementById('modal-list');
+        list.innerHTML = c.skills.map(s => `
+    <li><i class="fas fa-check-circle" style="color: ${currentColor}"></i><span>${s}</span></li>
+`).join('');
+
+        // ДОБАВЛЯЕМ ФОТО ТОЛЬКО ДЛЯ ЭЛЕКТРОНИКИ
+        if (id === 'electronics') {
+            const galleryHTML = `
+        <div class="modal-gallery">
+            <img src="./sGfqzEKx4yGS7p6jY59fRfbucvmIOBbJ89vNpl7Jdgw7Vrv9k0E-VbKDwIMzfrvd-xdG2vpyMMEcK5w2tUpSSSTk.jpg
+">
+            <img src="./70JbJPrgntxe3d9YFZ3JruBHFRoiU3F18indUA8u58rYKxCzPNyCY9vBo_HpQflRR3wtbUqrD9PR5Hwg-YkE8MoV.jpg">
+        </div>
+    `;
+            list.insertAdjacentHTML('afterend', galleryHTML);
         }
 
         function closeCourseModal() {
