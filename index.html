@@ -7,6 +7,72 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Базовый стиль для картинки-подложки */
+        .side-photo-left {
+            position: absolute;
+            top: 50%;
+            left: -180px; /* Сдвиг влево за край окна */
+            width: 220px;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            z-index: -1; /* Картинка КУДА-ТО ЗА основное белое окно */
+            opacity: 0;
+            transform: translateY(-50%) rotate(-5deg) scale(0.9);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+            /* Класс для анимации появления */
+            .side-photo-left.active {
+                opacity: 1;
+                transform: translateY(-50%) rotate(-2deg) scale(1);
+            }
+
+        /* Скрываем на мобильных, чтобы не вылезало за экран */
+        @media (max-width: 1024px) {
+            .side-photo-left {
+                display: none;
+            }
+        }
+        /* Контейнер для фото слева и справа */
+        .side-photo {
+            position: absolute;
+            top: 50%;
+            width: 200px; /* Ширина фото за пределами окна */
+            height: 150px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: -1; /* Чтобы фото были "под" или "за" основным окном */
+        }
+
+        /* Фото слева */
+        #photo-left {
+            left: -220px;
+            transform: translateY(-50%) translateX(50px);
+        }
+
+        /* Фото справа */
+        #photo-right {
+            right: -220px;
+            transform: translateY(-50%) translateX(-50px);
+        }
+
+        /* Класс активации для вылета фото */
+        .side-photo.show {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        /* Скрытие на маленьких экранах, чтобы не ломать верстку */
+        @media (max-width: 1200px) {
+            .side-photo {
+                display: none;
+            }
+        }
         /* Контейнер галереи */
         .modal-gallery {
             display: grid;
@@ -1194,72 +1260,77 @@ ${selected.map(c => `• ${c}`).join('\n')}`;
             }
         });
         function showCourseDetails(id) {
+            // Внутри функции showCourseDetails(id)
+            if (id === 8) {
+                // Находим основное белое окно модалки
+                const modalContent = document.querySelector('.modal-animate');
+
+                // Создаем элемент изображения
+                const leftImg = document.createElement('img');
+                leftImg.src = './sGfqzEKx4yGS7p6jY59fRfbucvmIOBbJ89vNpl7Jdgw7Vrv9k0E-VbKDwIMzfrvd-xdG2vpyMMEcK5w2tUpSSSTk.jpg';
+                leftImg.className = 'side-photo-left';
+                leftImg.id = 'dynamic-left-photo';
+
+                // Добавляем картинку внутрь контейнера (но за счет z-index она будет СЗАДИ)
+                modalContent.appendChild(leftImg);
+
+                // Запускаем анимацию с небольшой задержкой
+                setTimeout(() => {
+                    leftImg.classList.add('active');
+                }, 300);
+            }
             const c = courses.find(x => x.id === id);
             if (!c) return;
 
-            // Наполнение данными (обязательно должно быть здесь!)
-            const themeColors = {
-                'theme-electronics': '#f59e0b',
-                'theme-coding': '#10b981',
-                'theme-gamedev': '#3b82f6',
-                'theme-design': '#f43f5e',
-                'theme-ai': '#8b5cf6'
-            };
-            const currentColor = themeColors[c.theme] || '#6366f1';
+            // 1. Заполняем стандартные поля (убедитесь, что ID в HTML совпадают!)
+            const titleElem = document.getElementById('modal-title');
+            const descElem = document.getElementById('modal-desc');
+            const listElem = document.getElementById('modal-list');
 
-            document.getElementById('modal-icon-container').innerHTML = `<i class="fas ${c.icon}"></i>`;
-            document.getElementById('modal-icon-container').style.color = currentColor;
-            document.getElementById('modal-icon-container').style.backgroundColor = `${currentColor}15`;
-            document.getElementById('modal-tag').innerText = c.age;
-            document.getElementById('modal-tag').style.color = currentColor;
-            document.getElementById('modal-tag').style.backgroundColor = `${currentColor}15`;
-            document.getElementById('modal-title').innerText = c.title;
-            document.getElementById('modal-desc').innerText = c.details || c.desc;
-            document.getElementById('modal-list').innerHTML = c.skills.map(s => `
-            <li><i class="fas fa-check-circle" style="color: ${currentColor}"></i><span>${s}</span></li>
+            if (titleElem) titleElem.innerText = c.title;
+            if (descElem) descElem.innerText = c.details || c.desc;
+            if (listElem) {
+                listElem.innerHTML = c.skills.map(s => `
+            <li class="flex items-center space-x-3">
+                <i class="fas fa-check-circle text-orange-500"></i>
+                <span>${s}</span>
+            </li>
         `).join('');
+            }
 
+            // 2. УДАЛЯЕМ старые фото, если они остались от прошлого открытия
+            document.querySelectorAll('.side-photo').forEach(img => img.remove());
+
+            // 3. СПЕЦ-ЭФФЕКТ ДЛЯ "СВЕТЯЩЕГОСЯ ЧЕЛОВЕЧКА" (ID 8)
+            if (id === 8) {
+                const modalContent = document.querySelector('.modal-animate');
+
+                // Создаем левое фото
+                const imgL = document.createElement('img');
+                imgL.src = './sGfqzEKx4yGS7p6jY59fRfbucvmIOBbJ89vNpl7Jdgw7Vrv9k0E-VbKDwIMzfrvd-xdG2vpyMMEcK5w2tUpSSSTk.jpg';
+                imgL.className = 'side-photo left-pic';
+
+                // Создаем правое фото
+                const imgR = document.createElement('img');
+                imgR.src = './hQKxqIVkXib-_BDtDmRl_zLd6HJGOk1xvfMlKJotzEJHWpN17oK-YDNumlgYrpMRwrPV_fhPSYko8oxRwatSQ2S7.jpg';
+                imgR.className = 'side-photo right-pic';
+
+                modalContent.appendChild(imgL);
+                modalContent.appendChild(imgR);
+
+                // Плавное появление через задержку
+                setTimeout(() => {
+                    imgL.classList.add('show');
+                    imgR.classList.add('show');
+                }, 300);
+            }
+
+            // 4. Открываем модалку
             const modal = document.getElementById('course-modal');
-
-            // СБРОС: сначала убеждаемся, что классов нет, чтобы анимация пошла с нуля
-            modal.classList.remove('active', 'flex');
-            modal.classList.add('hidden');
-
-            // Трюк для перезапуска анимации:
-            // Force Reflow (заставляет браузер "забыть" старое состояние)
-            void modal.offsetWidth;
-
-            // Включаем отображение
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-
-            // Запускаем выезд
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
-
-            const modalWindow = modal.querySelector('.modal-animate');
-            modalWindow.style.background = `radial-gradient(circle at top right, ${currentColor}12, #ffffff)`;
+            setTimeout(() => modal.classList.add('active'), 10);
         }
-        // ... внутри функции showCourseDetails(id) ...
-
-        const list = document.getElementById('modal-list');
-        list.innerHTML = c.skills.map(s => `
-        <li><i class="fas fa-check-circle" style="color: ${currentColor}"></i><span>${s}</span></li>
-`).join('');
-
-        // ДОБАВЛЯЕМ ФОТО ТОЛЬКО ДЛЯ ЭЛЕКТРОНИКИ
-        if (id === 'electronics') {
-            const galleryHTML = `
-            <div class="modal-gallery">
-                <img src="./sGfqzEKx4yGS7p6jY59fRfbucvmIOBbJ89vNpl7Jdgw7Vrv9k0E-VbKDwIMzfrvd-xdG2vpyMMEcK5w2tUpSSSTk.jpg
-">
-                <img src="./70JbJPrgntxe3d9YFZ3JruBHFRoiU3F18indUA8u58rYKxCzPNyCY9vBo_HpQflRR3wtbUqrD9PR5Hwg-YkE8MoV.jpg">
-            </div>
-        `;
-            list.insertAdjacentHTML('afterend', galleryHTML);
-        }
-
         function closeCourseModal() {
             const modal = document.getElementById('course-modal');
             modal.classList.remove('active'); // Окно начинает уезжать вниз
@@ -1300,6 +1371,11 @@ ${selected.map(c => `• ${c}`).join('\n')}`;
                         top: targetElement.offsetTop,
                         behavior: 'smooth'
                     });
+                    const leftPhoto = document.getElementById('dynamic-left-photo');
+                    if (leftPhoto) {
+                        leftPhoto.classList.remove('active'); // Сначала плавно скрываем
+                        setTimeout(() => leftPhoto.remove(), 400); // Потом удаляем из кода
+                    }
                 }
             });
         });
