@@ -7,6 +7,54 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* ЛЕВОЕ ФОТО (Прямоугольное) */
+.extra-photo-window {
+    position: fixed;
+    top: 50%;
+    left: calc(50% - 550px); 
+    width: 220px;  /* Узкое */
+    height: 320px; /* Высокое */
+    z-index: 1001;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-50%) scale(0.8) rotate(-10deg);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ПРАВОЕ ФОТО (Квадратное) */
+.extra-photo-right {
+    position: fixed;
+    top: 50%;
+    right: calc(50% - 550px); 
+    width: 280px;  /* Ширина и высота одинаковые */
+    height: 280px; 
+    z-index: 1001;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-50%) scale(0.8) rotate(10deg);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Общие стили для картинок */
+.extra-photo-window img, .extra-photo-right img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Квадратное фото не растянется, а аккуратно обрежется */
+    border-radius: 24px;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.3);
+    border: 4px solid white;
+}
+
+/* Состояния при показе (активация через JS) */
+.extra-photo-window.show {
+    opacity: 1;
+    transform: translateY(-50%) scale(1) rotate(-4deg);
+}
+
+.extra-photo-right.show {
+    opacity: 1;
+    transform: translateY(-50%) scale(1) rotate(4deg);
+}
         /* Правое окно для фото */
         .extra-photo-right {
             position: fixed;
