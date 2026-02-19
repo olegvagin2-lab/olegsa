@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Пермский код: Цифровая экспедиция с Учи.ру</title>
 
-    <link rel="icon" type="image/jpeg" href="favicon.png">
-    
+    <link rel="icon" type="image/jpeg" href="./images (1).jpg">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -17,10 +17,9 @@
             scroll-behavior: smooth;
             -webkit-font-smoothing: antialiased;
             text-rendering: optimizeLegibility;
-            background-color: #f8fafc; /* Мягкий фон для контраста с карточками */
+            background-color: #f8fafc;
         }
 
-        /* --- СКРОЛЛБАРЫ --- */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -55,7 +54,6 @@
                 background: #818cf8;
             }
 
-        /* --- ЭКСТРА ФОТО (СПРАВА И СЛЕВА) --- */
         .extra-photo-right, .extra-photo-window {
             position: fixed;
             top: 50%;
@@ -103,7 +101,6 @@
             }
         }
 
-        /* --- КАРТОЧКИ КУРСОВ --- */
         .card-hover {
             display: flex;
             flex-direction: column;
@@ -182,7 +179,6 @@
             color: #64748b;
         }
 
-        /* ЦВЕТОВЫЕ ТЕМЫ ДЛЯ КАРТОЧЕК */
         .theme-electronics {
             --card-color: #f59e0b;
             --card-bg: #fef3c7;
@@ -208,7 +204,6 @@
             --card-bg: #dbeafe;
         }
 
-        /* ФОН HERO-БЛОКА */
         .gradient-hero {
             background: linear-gradient(-45deg, #4f46e5, #7c3aed, #2563eb, #db2777);
             background-size: 300% 300%;
@@ -230,7 +225,6 @@
             }
         }
 
-        /* --- МОДАЛЬНЫЕ ОКНА --- */
         .modal-backdrop {
             background-color: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(8px);
@@ -254,7 +248,6 @@
             opacity: 1;
         }
 
-        /* Стилизация инпутов формы */
         .input-modern {
             width: 100%;
             padding: 0.875rem 1rem;
@@ -644,7 +637,6 @@
 
             document.querySelectorAll('.extra-photo-window, .extra-photo-right').forEach(el => el.remove());
 
-            // Извлекаем цвет темы
             const tempDiv = document.createElement('div');
             tempDiv.className = c.theme;
             document.body.appendChild(tempDiv);
@@ -672,12 +664,10 @@
 
             const modal = document.getElementById('course-modal');
             modal.classList.remove('hidden');
-            // Маленькая задержка для анимации появления
             requestAnimationFrame(() => {
                 modal.classList.add('active');
             });
 
-            // Эффект фото для "Светящегося человечка"
             if (id === 8) {
                 const leftDiv = document.createElement('div');
                 leftDiv.className = 'extra-photo-window';
@@ -735,7 +725,6 @@
             }
         });
 
-        // Отправка формы (логика сохранена на 100%)
         document.getElementById('reg-form').addEventListener('submit', async function (e) {
             e.preventDefault();
             const form = e.target;
