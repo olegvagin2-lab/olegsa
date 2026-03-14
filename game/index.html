@@ -109,7 +109,21 @@
             font-weight: 600;
         }
 
-        /* Cards Row - single horizontal line */
+        .students-badge {
+            display: inline-block;
+            margin-top: 15px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15));
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            padding: 8px 22px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #A7F3D0;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+            letter-spacing: 0.5px;
+        }
+
+        /* Cards Row */
         .cards-grid {
             display: flex;
             flex-wrap: nowrap;
@@ -128,6 +142,7 @@
         .game-card:nth-child(3) { animation-delay: 0.19s; }
         .game-card:nth-child(4) { animation-delay: 0.26s; }
         .game-card:nth-child(5) { animation-delay: 0.33s; }
+        .game-card:nth-child(6) { animation-delay: 0.40s; }
 
         @keyframes cardIn {
             from { opacity: 0; transform: translateY(30px) scale(0.9); }
@@ -149,6 +164,8 @@
             transition: transform 0.3s, box-shadow 0.3s;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
             border: 1px solid rgba(255,255,255,0.3);
+            flex: 1; /* Распределяет ширину равномерно */
+            min-width: 0; /* Предотвращает поломку верстки из-за длинного текста */
         }
 
         .game-card::before {
@@ -170,6 +187,7 @@
         .card-c3::before { background: linear-gradient(90deg, #60A5FA, #3B82F6); }
         .card-c4::before { background: linear-gradient(90deg, #A78BFA, #8B5CF6); }
         .card-c5::before { background: linear-gradient(90deg, #EF4444, #F97316); }
+        .card-c6::before { background: linear-gradient(90deg, #F472B6, #DB2777); }
 
         .card-emoji {
             width: 72px;
@@ -188,6 +206,15 @@
         .card-c3 .card-emoji { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); }
         .card-c4 .card-emoji { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
         .card-c5 .card-emoji { background: linear-gradient(135deg, #FEE2E2, #FECACA); }
+        .card-c6 .card-emoji { background: linear-gradient(135deg, #FCE7F3, #FBCFE8); }
+
+        .card-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1; /* Заставляет центральную часть занимать все свободное место по высоте */
+            width: 100%;
+        }
 
         .card-age {
             background: #F1F5F9;
@@ -229,6 +256,7 @@
             transition: 0.2s;
             border: none;
             color: white;
+            margin-top: auto; /* Прижимает кнопку к самому низу */
         }
 
         .card-c1 .card-play-btn { background: linear-gradient(135deg, #F59E0B, #D97706); box-shadow: 0 4px 12px rgba(245,158,11,0.4); }
@@ -236,6 +264,7 @@
         .card-c3 .card-play-btn { background: linear-gradient(135deg, #3B82F6, #2563EB); box-shadow: 0 4px 12px rgba(59,130,246,0.4); }
         .card-c4 .card-play-btn { background: linear-gradient(135deg, #8B5CF6, #7C3AED); box-shadow: 0 4px 12px rgba(139,92,246,0.4); }
         .card-c5 .card-play-btn { background: linear-gradient(135deg, #EF4444, #DC2626); box-shadow: 0 4px 12px rgba(239,68,68,0.4); }
+        .card-c6 .card-play-btn { background: linear-gradient(135deg, #EC4899, #BE185D); box-shadow: 0 4px 12px rgba(236,72,153,0.4); }
 
         .game-card:hover .card-play-btn {
             transform: scale(1.03);
@@ -282,6 +311,11 @@
 
             .hero p {
                 font-size: 0.95rem;
+            }
+
+            .students-badge {
+                font-size: 0.75rem;
+                padding: 6px 16px;
             }
 
             .cards-grid {
@@ -347,6 +381,7 @@
                 font-size: 0.75rem;
                 border-radius: 12px;
                 flex-shrink: 0;
+                margin-top: 0; /* Убираем отступ на мобильных */
             }
 
             .btn-close-bg {
@@ -392,7 +427,6 @@
     <div class="site-bg"></div>
     <a href="https://koditok.ru" class="btn-close-bg" title="Вернуться на основной сайт">✖</a>
 
-    <!-- Floating particles -->
     <div class="particle" style="width:120px;height:120px;background:rgba(91,66,243,0.3);top:10%;left:5%;animation-delay:0s;"></div>
     <div class="particle" style="width:80px;height:80px;background:rgba(236,72,153,0.25);top:60%;right:8%;animation-delay:3s;"></div>
     <div class="particle" style="width:60px;height:60px;background:rgba(59,130,246,0.2);top:30%;right:15%;animation-delay:7s;"></div>
@@ -402,6 +436,7 @@
         <div class="hero-badge">🚀 Учи.ру & Koditok</div>
         <h1>Цифровая Экспедиция</h1>
         <p>Выбери игру и начни IT-приключение!</p>
+        <div class="students-badge">👨‍💻 Все игры разработаны нашими учениками</div>
     </div>
 
     <div class="cards-grid">
@@ -451,6 +486,16 @@
                 <div class="card-age">9 – 16 лет</div>
                 <h2>Match-IT</h2>
                 <div class="desc">Три в ряд с IT-стилем</div>
+            </div>
+            <div class="card-play-btn">ИГРАТЬ</div>
+        </a>
+
+        <a href="game_emoji/index.html" class="game-card card-c6">
+            <div class="card-emoji">✨</div>
+            <div class="card-info">
+                <div class="card-age">6 – 12 лет</div>
+                <h2>Угадай Эмоджи</h2>
+                <div class="desc">Найди зашифрованные силуэты</div>
             </div>
             <div class="card-play-btn">ИГРАТЬ</div>
         </a>
