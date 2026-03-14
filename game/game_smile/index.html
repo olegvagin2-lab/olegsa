@@ -48,7 +48,7 @@
             height: 100vh;
             z-index: -10;
             filter: blur(8px) brightness(0.5);
-            background-image: url('../bg_new.png'); /* Оставлен путь из исходника */
+            background-image: url('../bg_new.png'); 
             background-size: cover;
             background-position: center;
             transform: scale(1.1);
@@ -296,7 +296,6 @@
 
         .option-btn:disabled { pointer-events: none; }
 
-        /* REUSED FROM MATCH-IT */
         .section-label {
             font-weight: 800;
             color: #475569;
@@ -394,7 +393,8 @@
 <body>
     <div class="site-bg"></div>
     <canvas class="bg-particles" id="particles-canvas"></canvas>
-    <a href="../index.html" class="btn-home">🏠</a>
+    
+    <a href="https://koditok.ru/game/" class="btn-home">🏠</a>
     <a href="https://koditok.ru" class="btn-close">✖</a>
 
     <div id="screen-editor" class="full-screen animate-in">
@@ -524,7 +524,7 @@
         window.addEventListener('resize', initParticles);
         initParticles(); drawParticles();
 
-        // === SPARKLE FX (Victory effect) ===
+        // === SPARKLE FX ===
         function createSparkles(x, y, count) {
             const colors = ['#F59E0B', '#7C3AED', '#10B981', '#EC4899', '#3B82F6'];
             for (let i = 0; i < count; i++) {
@@ -580,24 +580,20 @@
         function loadNewRound() {
             isProcessing = false;
             
-            // Выбираем правильный ответ
             const mainIdx = Math.floor(Math.random() * EMOJI_SET.length);
             const currentEmoji = EMOJI_SET[mainIdx];
             correctAnswerName = currentEmoji.name;
 
-            // Выбираем 3 неправильных варианта
             const others = EMOJI_SET.filter((_, idx) => idx !== mainIdx);
             const selectedOthers = shuffleArray([...others]).slice(0, 3);
             
             const currentOptions = shuffleArray([currentEmoji, ...selectedOthers]);
 
-            // Обновляем дисплей (тень)
             emojiDisplay.textContent = currentEmoji.emoji;
             emojiDisplay.className = 'emoji-display silhouette';
             feedbackEl.innerHTML = '👉 Выбери верный вариант';
             feedbackEl.style.color = '#94A3B8';
 
-            // Настраиваем кнопки
             options.forEach((btn, i) => {
                 const opt = currentOptions[i];
                 btn.innerHTML = `<span>${opt.emoji}</span> ${opt.name}`;
@@ -614,23 +610,19 @@
             const button = event.currentTarget;
             const isCorrect = (chosenName === correctAnswerName);
 
-            // Блокируем кнопки
             options.forEach(btn => btn.disabled = true);
 
-            // Подсвечиваем кнопки
             options.forEach(btn => {
                 const btnName = btn.textContent.trim().split(' ').slice(1).join(' ');
                 if (btnName === correctAnswerName) btn.classList.add('correct-guess');
                 else if (btn === button && !isCorrect) btn.classList.add('wrong-guess');
             });
 
-            // Результат
             if (isCorrect) {
                 score += 100;
                 feedbackEl.innerHTML = '✨ Точно! +100 очков';
                 feedbackEl.style.color = 'var(--accent)';
                 
-                // Эффекты
                 emojiDisplay.className = 'emoji-display real-emoji';
                 const rect = emojiDisplay.getBoundingClientRect();
                 createSparkles(rect.left + rect.width / 2, rect.top + rect.height / 2, 20);
@@ -642,7 +634,6 @@
 
             updateHUD();
 
-            // Переход
             setTimeout(() => {
                 if (currentRound >= MAX_ROUNDS) {
                     endGame();
