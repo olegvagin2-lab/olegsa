@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Угадай Эмоджи | Цифровая Экспедиция</title>
+    <meta property="og:image" content="http://koditok.ru/im.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7C3AED;
+            --primary-glow: rgba(124, 58, 237, 0.5);
+            --accent: #10B981;
+            --accent-glow: rgba(16, 185, 129, 0.4);
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --glass: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            background: #0F0A1E;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* === BACKGROUND === */
+        .site-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -10;
+            filter: blur(8px) brightness(0.5);
+            background-image: url('../bg_new.png'); 
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.1);
+        }
+
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -5;
+            pointer-events: none;
+        }
+
+        /* === NAVIGATION === */
+        .btn-home,
+        .btn-close {
+            position: fixed;
+            top: 18px;
+            width: 46px;
+            height: 46px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 22px;
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .btn-home { left: 18px; }
+        .btn-close { right: 18px; }
+
+        .btn-home:hover,
+        .btn-close:hover {
+            transform: scale(1.15) rotate(5deg);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+        }
+
+        /* === HUD === */
+        .hud {
+            position: fixed;
+            top: 18px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .hud-item {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(16, 185, 129, 0.2));
+            backdrop-filter: blur(12px);
+            padding: 8px 18px;
+            border-radius: 18px;
+            font-weight: 800;
+            font-size: 14px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .hud-item .hud-val { transition: all 0.3s; }
+        .hud-item .hud-val.bump {
+            animation: scoreBump 0.4s ease;
+        }
+
+        @keyframes scoreBump {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.5); color: var(--warning); }
+            100% { transform: scale(1); }
+        }
+
+        /* === FULL-SCREEN === */
+        .full-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 5, 25, 0.6);
+            backdrop-filter: blur(20px);
+            z-index: 5000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .full-screen.animate-in {
+            animation: screenFadeIn 0.6s ease;
+        }
+
+        @keyframes screenFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* === CARD PANEL === */
+        .card-panel {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(240, 240, 255, 0.92));
+            padding: 32px;
+            border-radius: 28px;
+            color: #1E293B;
+            width: 92%;
+            max-width: 460px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(124, 58, 237, 0.15);
+            animation: panelSlideUp 0.7s cubic-bezier(.175, .885, .32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--warning));
+        }
+
+        .card-panel.game-board {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            color: white;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            z-index: 50;
+            margin-top: 50px;
+        }
+
+        @keyframes panelSlideUp {
+            0% { transform: translateY(60px) scale(0.9); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .editor-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), #EC4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+
+        .editor-subtitle {
+            font-weight: 600;
+            color: #94A3B8;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        /* GAME UI ELEMENTS */
+        .emoji-display {
+            font-size: 8rem;
+            line-height: 1;
+            margin: 20px 0;
+            transition: filter 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            display: block;
+        }
+
+        .silhouette {
+            filter: brightness(0) drop-shadow(0 0 15px rgba(124, 58, 237, 0.8));
+            color: transparent;
+            -webkit-text-stroke: 3px rgba(255, 255, 255, 0.1);
+            transform: scale(0.95);
+        }
+
+        .real-emoji {
+            filter: drop-shadow(0 0 30px rgba(245, 158, 11, 0.6));
+            transform: scale(1.1);
+        }
+
+        .feedback-message {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #94A3B8;
+            min-height: 28px;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(124, 58, 237, 0.2);
+            border-radius: 16px;
+            padding: 16px 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #F8FAFC;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+        }
+
+        .option-btn span { font-size: 1.6rem; }
+
+        .option-btn:hover {
+            background: rgba(124, 58, 237, 0.15);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.2);
+        }
+
+        .option-btn:active { transform: translateY(0); }
+
+        .option-btn.correct-guess {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: scale(1.05);
+            pointer-events: none;
+        }
+
+        .option-btn.wrong-guess {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--danger);
+            opacity: 0.6;
+            transform: scale(0.95);
+            pointer-events: none;
+            text-decoration: line-through 2px #EF4444;
+        }
+
+        .option-btn:disabled { pointer-events: none; }
+
+        .section-label {
+            font-weight: 800;
+            color: #475569;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 18px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-label::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(90deg, #CBD5E1, transparent);
+        }
+
+        .editor-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .editor-btn {
+            background: #F1F5F9; border: 2px solid transparent; border-radius: 14px;
+            padding: 12px 8px; cursor: pointer; font-size: 26px; transition: all 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .editor-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.15); }
+        .editor-btn.active {
+            border-color: var(--primary); background: white;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15), 0 4px 15px rgba(124, 58, 237, 0.1);
+            transform: scale(1.05);
+        }
+
+        .avatar-preview {
+            width: 80px; height: 80px; margin: 15px auto; font-size: 50px;
+            display: flex; align-items: center; justify-content: center; border-radius: 50%;
+            background: linear-gradient(145deg, rgba(124, 58, 237, 0.15), rgba(16, 185, 129, 0.1));
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.2);
+            animation: previewFloat 3s ease infinite;
+            border: 2px solid rgba(124, 58, 237, 0.2);
+        }
+
+        @keyframes previewFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #4C1D95);
+            color: white; border: none; padding: 16px 40px; border-radius: 30px;
+            font-weight: 800; font-size: 1.15rem; cursor: pointer; width: 100%;
+            letter-spacing: 1px; transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3); position: relative; overflow: hidden;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4); }
+        .btn-primary:active { transform: scale(0.97); }
+
+        .sparkle {
+            position: absolute; width: 6px; height: 6px; border-radius: 50%;
+            pointer-events: none; z-index: 1000; box-shadow: 0 0 8px var(--warning);
+        }
+
+        /* MODAL END GAME */
+        .modal-content {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(240, 240, 255, 0.9));
+            backdrop-filter: blur(12px); padding: 30px; border-radius: 28px;
+            text-align: center; max-width: 460px; width: 100%; max-height: 90vh;
+            overflow-y: auto; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            color: #1E293B; position: relative;
+            animation: panelSlideUp 0.7s cubic-bezier(.175, .885, .32, 1.275);
+        }
+        .modal-content::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--primary), var(--warning));
+        }
+
+        .modal-title {
+            font-size: 2rem; font-weight: 900; margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary), #EC4899);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .score-display { font-size: 2.5rem; font-weight: 900; margin: 8px 0 18px; color: #1E293B; }
+        
+        @media (max-width: 450px) {
+            .card-panel, .modal-content { width: 95%; padding: 24px; }
+            .emoji-display { font-size: 6rem; }
+            .option-btn { font-size: 0.9rem; padding: 12px 6px; }
+            .option-btn span { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="site-bg"></div>
+    <canvas class="bg-particles" id="particles-canvas"></canvas>
+    
+    <a href="https://koditok.ru/game/" class="btn-home">🏠</a>
+    <a href="https://koditok.ru" class="btn-close">✖</a>
+
+    <div id="screen-editor" class="full-screen animate-in">
+        <div class="card-panel" style="position:relative;">
+            <div class="editor-title">✨ Угадай Эмоджи</div>
+            <div class="editor-subtitle">Выбери аватар и найди их всех по силуэту</div>
+
+            <div class="avatar-preview" id="avatar-preview">🤖</div>
+
+            <div class="section-label">👤 Аватар</div>
+            <div class="editor-grid" id="avatar-list">
+                <div class="editor-btn active" onclick="selectAvatar('🤖')">🤖</div>
+                <div class="editor-btn" onclick="selectAvatar('👨‍💻')">👨‍💻</div>
+                <div class="editor-btn" onclick="selectAvatar('👩‍💻')">👩‍💻</div>
+                <div class="editor-btn" onclick="selectAvatar('😺')">😺</div>
+                <div class="editor-btn" onclick="selectAvatar('🦊')">🦊</div>
+                <div class="editor-btn" onclick="selectAvatar('🐸')">🐸</div>
+                <div class="editor-btn" onclick="selectAvatar('🦄')">🦄</div>
+                <div class="editor-btn" onclick="selectAvatar('🐉')">🐉</div>
+            </div>
+
+            <button class="btn-primary" onclick="startGame()">🚀 НАЧАТЬ ИГРУ</button>
+        </div>
+    </div>
+
+    <div id="screen-game" class="full-screen" style="display: none; background: transparent; backdrop-filter: none;">
+        <div class="hud">
+            <div class="hud-item" id="avatar-hud">🤖</div>
+            <div class="hud-item">⭐ <span id="score" class="hud-val">0</span></div>
+            <div class="hud-item">🎯 <span id="roundDisplay" class="hud-val">1/10</span></div>
+        </div>
+
+        <div class="card-panel game-board">
+            <div class="emoji-display silhouette" id="emojiDisplay">🐶</div>
+            <div class="feedback-message" id="feedbackMsg">👉 Выбери верный вариант</div>
+            
+            <div class="options-grid" id="optionsContainer">
+                <button class="option-btn" id="opt0"><span>🐶</span> собака</button>
+                <button class="option-btn" id="opt1"><span>🐱</span> кошка</button>
+                <button class="option-btn" id="opt2"><span>🐭</span> мышь</button>
+                <button class="option-btn" id="opt3"><span>🐸</span> лягушка</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-gameover" class="full-screen" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-title" id="go-title">Победа!</div>
+            <div class="score-display">Очки: <span id="final-score">0</span></div>
+
+            <div style="margin: 15px 0; text-align:left;">
+                <h4 style="text-align:center; margin-bottom:10px; color:#475569;">🎁 Призы за очки</h4>
+                <div id="go-shop-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+            </div>
+
+            <a href="https://forms.amocrm.ru/rczvvlc" target="_blank" class="btn-primary"
+                style="display:block; text-decoration:none; text-align:center; margin-bottom: 8px;">📝 ЗАПИСАТЬСЯ НА КУРС</a>
+            <button class="btn-primary"
+                style="background:transparent; color: #64748B; border: 2px solid #E2E8F0; box-shadow: none;"
+                onclick="location.reload()">🔄 ЗАНОВО</button>
+        </div>
+    </div>
+
+    <script>
+        // === CONFIG / STATE ===
+        let playerAvatar = '🤖';
+        let score = 0;
+        let currentRound = 1;
+        const MAX_ROUNDS = 10;
+        let correctAnswerName = '';
+        let isProcessing = false;
+
+        const EMOJI_SET = [
+            { emoji: '🐶', name: 'собака' }, { emoji: '🐱', name: 'кошка' },
+            { emoji: '🐭', name: 'мышь' }, { emoji: '🐸', name: 'лягушка' },
+            { emoji: '🐻', name: 'медведь' }, { emoji: '🐨', name: 'коала' },
+            { emoji: '🐧', name: 'пингвин' }, { emoji: '🐮', name: 'корова' },
+            { emoji: '🦊', name: 'лиса' }, { emoji: '🦝', name: 'енот' },
+            { emoji: '🐙', name: 'осьминог' }, { emoji: '🦄', name: 'единорог' },
+            { emoji: '🐞', name: 'божья коровка' }, { emoji: '🐳', name: 'кит' },
+            { emoji: '👽', name: 'пришелец' }, { emoji: '👻', name: 'призрак' },
+            { emoji: '🐉', name: 'дракон' }, { emoji: '🐢', name: 'черепаха' }
+        ];
+
+        // === DOM ELEMENTS ===
+        const screenEditor = document.getElementById('screen-editor');
+        const screenGame = document.getElementById('screen-game');
+        const screenGameOver = document.getElementById('screen-gameover');
+        const emojiDisplay = document.getElementById('emojiDisplay');
+        const feedbackEl = document.getElementById('feedbackMsg');
+        const scoreSpan = document.getElementById('score');
+        const roundSpan = document.getElementById('roundDisplay');
+        const options = [
+            document.getElementById('opt0'), document.getElementById('opt1'),
+            document.getElementById('opt2'), document.getElementById('opt3')
+        ];
+
+        // === BACKGROUND PARTICLES ===
+        const cvs = document.getElementById('particles-canvas');
+        const ctx = cvs.getContext('2d');
+        let particles = [];
+        
+        function initParticles() {
+            cvs.width = window.innerWidth;
+            cvs.height = window.innerHeight;
+            particles = [];
+            for (let i = 0; i < 40; i++) {
+                particles.push({
+                    x: Math.random() * cvs.width, y: Math.random() * cvs.height,
+                    r: Math.random() * 2.5 + 0.5, dx: (Math.random() - 0.5) * 0.5,
+                    dy: (Math.random() - 0.5) * 0.5, alpha: Math.random() * 0.4 + 0.1
+                });
+            }
+        }
+        
+        function drawParticles() {
+            ctx.clearRect(0, 0, cvs.width, cvs.height);
+            particles.forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(124, 58, 237, ${p.alpha})`; ctx.fill();
+                p.x += p.dx; p.y += p.dy;
+                if (p.x < 0 || p.x > cvs.width) p.dx *= -1;
+                if (p.y < 0 || p.y > cvs.height) p.dy *= -1;
+            });
+            requestAnimationFrame(drawParticles);
+        }
+        window.addEventListener('resize', initParticles);
+        initParticles(); drawParticles();
+
+        // === SPARKLE FX ===
+        function createSparkles(x, y, count) {
+            const colors = ['#F59E0B', '#7C3AED', '#10B981', '#EC4899', '#3B82F6'];
+            for (let i = 0; i < count; i++) {
+                const spark = document.createElement('div');
+                spark.className = 'sparkle';
+                spark.style.left = x + 'px'; spark.style.top = y + 'px';
+                spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+                document.body.appendChild(spark);
+
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * 80 + 40;
+                spark.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px) scale(0)`, opacity: 0 }
+                ], { duration: 600 + Math.random() * 400, easing: 'cubic-bezier(.4,0,.2,1)' });
+                setTimeout(() => spark.remove(), 1000);
+            }
+        }
+
+        // === GAME FLOW ===
+        function selectAvatar(a) {
+            playerAvatar = a;
+            document.getElementById('avatar-preview').innerText = a;
+            document.querySelectorAll('#avatar-list .editor-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText.trim() === a);
+            });
+        }
+
+        function startGame() {
+            screenEditor.style.display = 'none';
+            screenGame.style.display = 'flex';
+            document.getElementById('avatar-hud').innerText = playerAvatar;
+            score = 0;
+            currentRound = 1;
+            updateHUD();
+            loadNewRound();
+        }
+
+        function shuffleArray(arr) {
+            return arr.sort(() => Math.random() - 0.5);
+        }
+
+        function updateHUD() {
+            if (parseInt(scoreSpan.innerText) !== score) {
+                scoreSpan.innerText = score;
+                scoreSpan.classList.remove('bump');
+                void scoreSpan.offsetWidth;
+                scoreSpan.classList.add('bump');
+            }
+            roundSpan.innerText = `${currentRound}/${MAX_ROUNDS}`;
+        }
+
+        function loadNewRound() {
+            isProcessing = false;
+            
+            const mainIdx = Math.floor(Math.random() * EMOJI_SET.length);
+            const currentEmoji = EMOJI_SET[mainIdx];
+            correctAnswerName = currentEmoji.name;
+
+            const others = EMOJI_SET.filter((_, idx) => idx !== mainIdx);
+            const selectedOthers = shuffleArray([...others]).slice(0, 3);
+            
+            const currentOptions = shuffleArray([currentEmoji, ...selectedOthers]);
+
+            emojiDisplay.textContent = currentEmoji.emoji;
+            emojiDisplay.className = 'emoji-display silhouette';
+            feedbackEl.innerHTML = '👉 Выбери верный вариант';
+            feedbackEl.style.color = '#94A3B8';
+
+            options.forEach((btn, i) => {
+                const opt = currentOptions[i];
+                btn.innerHTML = `<span>${opt.emoji}</span> ${opt.name}`;
+                btn.className = 'option-btn';
+                btn.disabled = false;
+                btn.onclick = (e) => handleOptionClick(e, opt.name);
+            });
+        }
+
+        function handleOptionClick(event, chosenName) {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            const button = event.currentTarget;
+            const isCorrect = (chosenName === correctAnswerName);
+
+            options.forEach(btn => btn.disabled = true);
+
+            options.forEach(btn => {
+                const btnName = btn.textContent.trim().split(' ').slice(1).join(' ');
+                if (btnName === correctAnswerName) btn.classList.add('correct-guess');
+                else if (btn === button && !isCorrect) btn.classList.add('wrong-guess');
+            });
+
+            if (isCorrect) {
+                score += 100;
+                feedbackEl.innerHTML = '✨ Точно! +100 очков';
+                feedbackEl.style.color = 'var(--accent)';
+                
+                emojiDisplay.className = 'emoji-display real-emoji';
+                const rect = emojiDisplay.getBoundingClientRect();
+                createSparkles(rect.left + rect.width / 2, rect.top + rect.height / 2, 20);
+            } else {
+                feedbackEl.innerHTML = `❌ Мимо... Это ${correctAnswerName}`;
+                feedbackEl.style.color = 'var(--danger)';
+                emojiDisplay.className = 'emoji-display real-emoji';
+            }
+
+            updateHUD();
+
+            setTimeout(() => {
+                if (currentRound >= MAX_ROUNDS) {
+                    endGame();
+                } else {
+                    currentRound++;
+                    updateHUD();
+                    loadNewRound();
+                }
+            }, 1500);
+        }
+
+        // === GAME OVER & SHOP ===
+        const shopItems = [
+            { id: 'prize-10', title: 'Скидка 10% на любой курс', cost: 0, icon: '🎁', gradient: 'linear-gradient(135deg, #10B981, #059669)' },
+            { id: 'prize-15', title: 'Скидка 15% на курс Электроники', cost: 300, icon: '🔌', gradient: 'linear-gradient(135deg, #3B82F6, #1D4ED8)' },
+            { id: 'prize-sticker', title: 'Фирменный стикерпак', cost: 600, icon: '🎒', gradient: 'linear-gradient(135deg, #EC4899, #BE185D)' },
+            { id: 'prize-lesson', title: 'Бесплатное занятие', cost: 900, icon: '🎓', gradient: 'linear-gradient(135deg, #F59E0B, #D97706)' }
+        ];
+
+        function endGame() {
+            screenGame.style.display = 'none';
+            screenGameOver.style.display = 'flex';
+            document.getElementById('final-score').innerText = score;
+            
+            const goTitle = document.getElementById('go-title');
+            if (score === 1000) goTitle.innerText = "Идеально! 🏆";
+            else if (score >= 500) goTitle.innerText = "Отличная игра! ✨";
+            else goTitle.innerText = "Хорошая попытка! 👍";
+
+            renderShop();
+        }
+
+        function renderShop() {
+            const container = document.getElementById('go-shop-container');
+            container.innerHTML = '';
+            shopItems.forEach(item => {
+                const unlocked = score >= item.cost;
+                const div = document.createElement('div');
+                div.style.cssText = `display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:2px solid ${unlocked ? '#10B981' : '#E2E8F0'};background:${unlocked ? 'rgba(16,185,129,0.06)' : '#F8FAFC'};cursor:${unlocked ? 'pointer' : 'not-allowed'};opacity:${unlocked ? 1 : 0.5};transition:0.2s;`;
+                div.innerHTML = `
+                    <div style="width:42px;height:42px;border-radius:12px;background:${unlocked ? item.gradient : '#CBD5E1'};display:flex;justify-content:center;align-items:center;font-size:22px;box-shadow:0 4px 10px rgba(0,0,0,0.15);">${unlocked ? item.icon : '🔒'}</div>
+                    <div style="flex:1;">
+                        <div style="font-weight:800;font-size:13px;color:#1E293B;">${item.title}</div>
+                        <div style="font-size:11px;font-weight:700;color:${unlocked ? '#10B981' : '#EF4444'};">${item.cost > 0 ? (unlocked ? '✅ Разблокировано' : `🔒 Нужно ${item.cost} очков`) : '⭐ Бесплатно'}</div>
+                    </div>`;
+                container.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
