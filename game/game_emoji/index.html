@@ -81,7 +81,7 @@
             text-decoration: none;
             font-size: 22px;
             color: white;
-            z-index: 1000;
+            z-index: 20000; /* Максимальный приоритет */
             transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
         }
 
@@ -98,7 +98,9 @@
         /* === HUD === */
         .hud {
             position: fixed;
-            top: 18px;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             gap: 10px;
             z-index: 100;
@@ -382,7 +384,19 @@
         .score-display { font-size: 2.5rem; font-weight: 900; margin: 8px 0 18px; color: #1E293B; }
         
         @media (max-width: 450px) {
+            .btn-home, .btn-close {
+                top: 12px;
+                width: 38px;
+                height: 38px;
+                font-size: 18px;
+            }
+            .btn-home { left: 12px; }
+            .btn-close { right: 12px; }
+            .hud {
+                top: 65px; /* Опускаем панель счета, чтобы она не мешала кнопкам */
+            }
             .card-panel, .modal-content { width: 95%; padding: 24px; }
+            .card-panel.game-board { margin-top: 80px; }
             .emoji-display { font-size: 6rem; }
             .option-btn { font-size: 0.9rem; padding: 12px 6px; }
             .option-btn span { font-size: 1.3rem; }
